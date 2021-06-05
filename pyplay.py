@@ -41,7 +41,13 @@ def get_audio_url(yt_url, quality ):
 	
 	return music, yt_vid
 
-
+def welcome_msg():
+	print("--------------- PYPLAY ----------------------")
+	print()
+	print("Welcome to Pyplay.\nEnter HELP for list of commands")
+	print("\nplay song_name \n")
+	print("to start playing a song")
+	print("---------------------------------------------")
 
 class pyplay(object):
 	
@@ -51,58 +57,282 @@ class pyplay(object):
 			self.player.stop()
 		except:
 			pass
+		
 		if sng_name != None:
 			search = crawl.get_relevant_url(sng_name)
 			music, yt = get_audio_url(search['url'], quality)
-			player = vlc.MediaPlayer(music.url)
+			q = [music.url]
+			qname = [yt]
+			
+			mediaList = vlc.MediaList(q)
+			player = vlc.MediaListPlayer()
+			player.set_media_list(mediaList)
+			
+			play_state = 1
 			player.play()
 		else:
-			music, yt = None, None
-			player = vlc.MediaPlayer()
-			
+			q, qname, mediaList = None, None, None
+			player = vlc.MediaListPlayer()
+			play_state = 0
+		
 		instance = player.get_instance()                           #getting instance
 		instance.log_unset()                                       #unsetting log
-
-		self.music = music
-		self.yt = yt
+		
+		self.q = q
+		self.qname = qname
+		self.mediaList = mediaList
 		self.quality = quality
 		self.player = player
+		self.exit_state = False
+		self.play_state = play_state
 		
-	def play(self, sng_name, quality = None):
+		#pass
+	
+	
+	def play(self, sng_name = None, quality = None, url = False):
+		
+		
 		
 		player = self.player
 		if quality == None:
 			self.quality = quality
+		
+		if sng_name != None and len(sng_name) !=0:
+			try:
+				self.MediaList.release()
+			except:
+				pass
 			
-		if sng_name != None:
-			search = crawl.get_relevant_url(sng_name)
-			music, yt = get_audio_url(search['url'], self.quality)
-			player.set_mrl(music.url)
+			if url == False:
+				search = crawl.get_relevant_url(sng_name)
+				music, yt = get_audio_url(search['url'], self.quality)
+			else:
+				music, yt = get_audio_url(sng_name, self.quality)
 			
-			self.music = music
-			self.yt = yt
+			q = [music.url]
+			qname = [yt]
+			mediaList = vlc.MediaList(q)
+			player = vlc.MediaListPlayer()
+			player.set_media_list(mediaList)
 			
+			self.q = q
+			self.qname = qname
+			self.mediaList = mediaList
+			self.player = player
+			self.play_state = 1
+		
 		player.play()
+		
+		mediaList = self.mediaList
+		if mediaList == None:
+			print("No song in playlist")
+		
+		#pass
+	
 	
 	def pause(self):
 		player = self.player
 		player.pause()
+		
+		#pass
 	
+	
+	def skip(self):
+		player = self.player
+		player.next()
+		
+		#pass
+	
+	
+	def add(self, sng_name, quality = None):
+		# to add a song to queue
+		player = self.player
+		q = self.q
+		qname = self.qname
+		mediaList = self.mediaList
+		
+		if sng_name != None:
+			search = crawl.get_relevant_url(sng_name)
+			music, yt = get_audio_url(search['url'], self.quality)
+			q.append(music.url)
+			qname.append(yt)
+			mediaList.add_media(music.url)
+			
+			self.q = q
+			self.qname = qname
+			self.mediaList = mediaList
+		
+		#pass
+	
+	
+	def show_q(self):
+		player = self.player
+		q = self.q
+		qname = self.qname
+		mediaList = self.mediaList
+		
+		mediaList.lock()
+		
+		count = mediaList.count()
+		if count == len(q):
+			
+			for vid in qname:
+				print(vid.title, " || ", vid.duration)
+		mediaList.unlock()
+		
+		#pass
+	
+	
+	def remove_last(self):
+		player = self.player
+		mediaList = self.mediaList
+		
+		mediaList.lock()
+		count = mediaList.count()			
+		mediaList.unlock()
+		
+		self.remove(count-1)
+		
+		self.player = player
+		self.mediaList = mediaList
+		#pass
+	
+	
+	def search_sng(self, sng_name):
+		search_urls, results = crawl.get_search(sng_name)
+		i = 1
+		for result in results:
+			print(i, ' -- ', result['duration'], ' -- ', result['title'][:20])
+			i += 1
+		print("\nEnter number to select or 0 to go back")
+		
+		try:
+			search_ind = int(input(">> "))
+			if search_ind == 0:
+				pass
+			else:
+				i = search_ind-1
+				try:
+					sng_url = search_urls[i]
+					if self.play_state == 1:
+						self.add_url(sng_url)
+					else:
+						self.play(sng_url, url=True)
+				except:
+					print("not valid")
+		except:
+			print("not valid")
+		
+	
+	# insider methods
+	
+	def player(self):
+		# debug feature
+		return self.player
+		
 	def stop(self):
 		player = self.player
 		player.stop()
+		
+		#pass
 	
 	def end(self):
 		player = self.player
 		inst = player.get_instance()
 		inst.release()
+		
+		self.exit_state = True
+		#pass
+	
+	def add_url(self, sng_url, quality = None):
+		# to add a song to queue
+		player = self.player
+		q = self.q
+		qname = self.qname
+		mediaList = self.mediaList
+		
+		if sng_url != None:
+			music, yt = get_audio_url(sng_url, self.quality)
+			q.append(music.url)
+			qname.append(yt)
+			mediaList.add_media(music.url)
+			
+			self.q = q
+			self.qname = qname
+			self.mediaList = mediaList
+	
+	
+	def remove(self, i):
+		player = self.player
+		q = self.q
+		qname = self.qname
+		mediaList = self.mediaList
+		
+		mediaList.lock()
+		mediaList.remove_index(i)
+		q.pop(i)
+		qname.pop(i)
+		
+		mediaList.unlock()
+		self.player = player
+		self.q = q
+		self.qname = qname
+		self.mediaList = mediaList
+	
+	def help(self):
+		print("play <song_name>")
+		print("add <song_name>")
+		print("showq")
+		print("pause")
+		print("stop")
+		print("rmlast  - remove last added song")
+		print("skip")
+		print("end     - to end pyplay")
+		#pass
+	
+	
+	def get_command(self):
+		
+		inp = input("-- ")
+		
+		inp = inp.split(' ')
+		command = (inp.pop(0)).lower()
+		search = ' '.join(inp)
+		
+		if command == 'play': # and len(search) != 0:
+			self.play(search)
+		elif command == 'add':
+			self.add(search)
+		elif command == 'pause' or command == 'resume': # or (command == 'play' and len(search)==0):
+			self.pause()
+		elif command == 'skip':
+			self.skip()
+		elif command == 'showq':
+			self.show_q()
+		elif command == 'rmlast':
+			self.remove_last()
+		elif command == 'search':
+			self.search_sng(search)
+		
+		elif command == 'stop':
+			self.stop()
+		elif command == 'end':
+			self.end()
+		elif command == 'help':
+			self.help()
+		else:
+			print("Enter a valid command. Type HELP for list of available commands")
 
 
 
 # readymade pyplay object
 p = pyplay() 
 
-if __name__ == "main":
-	p.play("Runaway")
-	r = input()
-	p.stop()
+if __name__ == '__main__':
+	
+	welcome_msg()
+	while True:
+		p.get_command()
+		if p.exit_state:
+			break
+
