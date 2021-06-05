@@ -282,7 +282,8 @@ class pyplay(object):
 	def help(self):
 		print("play <song_name>")
 		print("add <song_name>")
-		print("showq")
+		print("search <song_name>")
+		print("showq   - to show all songs in the playlist")
 		print("pause")
 		print("stop")
 		print("rmlast  - remove last added song")
