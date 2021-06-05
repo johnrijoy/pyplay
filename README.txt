@@ -31,6 +31,7 @@ skip - skip the current song
 showq - to list all songs in playlist
 stop - to stop playing.
 end - to end the program
+setvol <0-100> - adjust volume between 0 and 100 (default 100)
 help - to show list of commands
 
 COMMENTS:

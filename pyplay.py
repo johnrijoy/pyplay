@@ -14,8 +14,9 @@ search for songs and return the most relevant link.
 test url - https://www.youtube.com/watch?v=GeV4j6lo7Yw - Runaway: AURORA
 
 crawl.get_search(song_name)
-"--verbose=-1"
 """
+# commands
+
 
 def get_audio_url(yt_url, quality ):
 	"""
@@ -98,6 +99,10 @@ class pyplay(object):
 			self.quality = quality
 		
 		if sng_name != None and len(sng_name) !=0:
+			try:
+				self.player.release()
+			except:
+				pass
 			try:
 				self.MediaList.release()
 			except:
@@ -219,9 +224,9 @@ class pyplay(object):
 					else:
 						self.play(sng_url, url=True)
 				except:
-					print("not valid")
+					print("<not valid!>")
 		except:
-			print("not valid")
+			print("<not valid!>")
 		
 	
 	# insider methods
@@ -235,6 +240,19 @@ class pyplay(object):
 		player.stop()
 		
 		#pass
+	def set_vol(self, vol):
+		try:
+			vol = int(vol)
+			listPlayer = self.player
+			player = listPlayer.get_media_player()
+			current_vol = player.audio_get_volume()
+			ret = player.audio_set_volume(vol)
+			if ret == 0:
+				print("[vol set: ", current_vol, "-->", vol, "]")
+			else:
+				print("<not valid!>")
+		except:
+			print("<not valid!>")
 	
 	def end(self):
 		player = self.player
@@ -281,13 +299,14 @@ class pyplay(object):
 	
 	def help(self):
 		print("play <song_name>")
-		print("add <song_name>")
+		print("add <song_name> - to add song to queue")
 		print("search <song_name>")
 		print("showq   - to show all songs in the playlist")
 		print("pause")
 		print("stop")
 		print("rmlast  - remove last added song")
 		print("skip")
+		print("setvol <0-100> - enter value between 0 and 100 to set volume")
 		print("end     - to end pyplay")
 		#pass
 	
@@ -298,13 +317,13 @@ class pyplay(object):
 		
 		inp = inp.split(' ')
 		command = (inp.pop(0)).lower()
-		search = ' '.join(inp)
+		inp = ' '.join(inp)
 		
-		if command == 'play': # and len(search) != 0:
-			self.play(search)
+		if command == 'play': # and len(inp) != 0:
+			self.play(inp)
 		elif command == 'add':
 			self.add(search)
-		elif command == 'pause' or command == 'resume': # or (command == 'play' and len(search)==0):
+		elif command == 'pause' or command == 'resume': # or (command == 'play' and len(inp)==0):
 			self.pause()
 		elif command == 'skip':
 			self.skip()
@@ -313,7 +332,9 @@ class pyplay(object):
 		elif command == 'rmlast':
 			self.remove_last()
 		elif command == 'search':
-			self.search_sng(search)
+			self.search_sng(inp)
+		elif command == 'setvol':
+			self.set_vol(inp)
 		
 		elif command == 'stop':
 			self.stop()
