@@ -15,6 +15,7 @@ class PlaybackController:
         print("Init musicPlay Object")
         self.mediaList = vlc.MediaList(self.songQ)
         self.player = vlc.MediaListPlayer()
+        self.player.get_instance().log_unset()
         self.player.set_media_list(self.mediaList)
         self.audio_state = AudioState()
 
@@ -61,6 +62,10 @@ class PlaybackController:
             return previous_vol
         else:
             return -1
+        
+    def end_player(self):
+        self.player.stop()
+        self.player.release()
     
     # Music control functions - High Level
 

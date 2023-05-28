@@ -5,9 +5,11 @@ class AudioDetails:
     duration: int
     audio_stream: str
 
+    def get_duration(self) -> str:
+        return "{}m{}s".format(self.duration//60, (self.duration)%60)
+
     def __repr__(self) -> str:
-        tot_time = "{}m{}s".format(self.duration//60, (self.duration)%60)
-        return "< song: '{}' duration: {} >".format(self.title, tot_time)
+        return "< song: '{}' duration: {} >".format(self.title, self.get_duration())
 
 class AudioState(AudioDetails):
     track_index: int = -1
