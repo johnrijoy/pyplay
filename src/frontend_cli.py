@@ -10,16 +10,17 @@ def welcome_screen():
     print("---------------------------------------------")
 
 def help_screen():
-    print("play <song_name>")
-    print("add <song_name> - to add song to queue")
-    print("search <song_name>")
-    print("showq   - to show all songs in the playlist")
-    print("pause")
-    print("stop")
-    print("rmlast  - remove last added song")
-    print("skip")
-    print("setvol <0-100> - enter value between 0 and 100 to set volume")
-    print("end     - to end pyplay")
+    print("play <song_name>   - play song ")
+    print("add <song_name>    - to add song to queue")
+    print("search <song_name> - display search result")
+    print("showq              - to show all songs in the playlist")
+    print("nowp               - to show all songs in the playlist")
+    print("pause              - pause the song")
+    print("stop               - stop the player")
+    print("rmlast             - remove last added song")
+    print("skip               - skip song")
+    print("setvol <0-100>     - enter value between 0 and 100 to set volume")
+    print("end , q            - to exit pyplay")
 
 def process_input(command: str, args: list, playbackController: PlaybackController):
 
