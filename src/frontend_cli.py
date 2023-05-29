@@ -26,37 +26,41 @@ def process_input(command: str, args: list, playbackController: PlaybackControll
 
     command = command.lower()
 
-    if command == 'play': # and len(inp) != 0:
+    if command == 'play' or command == 'pl': # and len(inp) != 0:
         if(len(args)<1):
             print("Atleast one argument required")
         else:
             audioDetails = get_song(" ".join(args))
             playbackController.append_song(audioDetails)
-            playbackController.start_playback()
-    elif command == 'add':
+        playbackController.start_playback()
+    elif command == 'add' or command == 'a':
         if(len(args)<1):
             print("Atleast one argument required")
         else:
-            audioDetails = get_song(args[0])
+            audioDetails = get_song(" ".join(args))
             playbackController.append_song(audioDetails)
-    elif command == 'pause' or command == 'resume': # or (command == 'play' and len(inp)==0):
+    elif command == 'pause' or command == 'resume' or command == 'p':
         playbackController.pause_resume()
-    elif command == 'skip':
+    elif command == 'skip' or command == 'sk':
         playbackController.skip_song()
-    elif command == 'showq':
+    elif command == 'showq' or command == 'sq':
         song_queue = playbackController.songQ
         print("-- Playlist --")
         for index, song in enumerate(song_queue):
-            print("{:3} - {:20} - {}".format(index, song.title, song.get_duration()))
-    elif command == 'rmlast':
+            print("{:3} - {:20} - {}".format(index+1, song.title, song.get_duration()))
+    elif command == 'nowp' or command == 'n':
+        audio_state = playbackController.get_now_playing()
+        print("-- Now Playing --")
+        print("{}".format(audio_state))
+    elif command == 'rmlast' or command == 'rml':
         playbackController.remove_last()
-    elif command == 'search':
+    elif command == 'search' or command == 'sr':
         if(len(args)<1):
             print("Atleast one argument required")
         else:
             audioDetailsList = search_song(" ".join(args))
             for index, song in enumerate(audioDetailsList):
-                print("{:3} - {:20} - {}".format(index+1, song.title, song.get_duration()))
+                print("{:3} - {:50} - {}".format(index+1, song.title, song.get_duration()))
             
             print("\nEnter number to select or 0 to go back")
             usr_inp = int(input(">> "))
@@ -71,7 +75,7 @@ def process_input(command: str, args: list, playbackController: PlaybackControll
             else:
                 print("returning ...")
 
-    elif command == 'setvol':
+    elif command == 'setvol' or command == 'vl':
         if(len(args)<1):
             print("Atleast one argument required")
         else:
@@ -85,9 +89,9 @@ def process_input(command: str, args: list, playbackController: PlaybackControll
             except TypeError:
                 print("Integer volume required")
 
-    elif command == 'stop':
+    elif command == 'stop' or command == 'st':
         playbackController.stop_playback()
-    elif command == 'help':
+    elif command == 'help' or command == 'h':
         help_screen()
     else:
         print("Enter a valid command. Type HELP for list of available commands")

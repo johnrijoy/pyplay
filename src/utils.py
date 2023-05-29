@@ -32,4 +32,9 @@ class AudioState(AudioDetails):
     def __repr__(self) -> str:
         curr_time = "{}m{}s".format(self.current_position//60, (self.current_position)%60)
         tot_time = "{}m{}s".format(self.total_duration//60, (self.total_duration)%60)
-        return "< song: '{}' playing: 0m0s--{}--{} >".format(self.title, curr_time, tot_time)
+        short_tile = ""
+        if(len(self.title)>50):
+            short_tile = self.title[:47] + "..."
+        else:
+            short_tile = self.title[:50]
+        return "< song: '{}' playing: 0m0s--{}--{} >".format(short_tile, curr_time, tot_time)
