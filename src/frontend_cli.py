@@ -7,6 +7,7 @@ from rich.progress import (
     Progress,
     TextColumn,
 )
+import keyboard
 
 def welcome_screen():
     rprint("--------------- [bold green]PYPLAY[/bold green] ----------------------")
@@ -36,19 +37,29 @@ def show_now_playing(audioState : AudioState):
 
 
     # Define custom progress bar
+    text1 = TextColumn("[green]{task.fields[curr_time]}")
+    text2 = TextColumn("[cyan]{task.fields[tot_time]}")
+
     progress_bar = Progress(
         TextColumn("[green] ▶ "),
         BarColumn(),
-        TextColumn("[green]{}".format(curr_time)),
+        text1,
         TextColumn("•"),
-        TextColumn("[cyan]{}".format(tot_time)),
+        text2,
     )
 
     # Use custom progress bar
     with progress_bar as p:
         p.console.print("[green]Now Playing")
         p.console.print("[bold red]%40s[/bold red] - [orange1]%s[/orange1]" % (audioState.title[:40], audioState.uploader))
-        p.add_task("", completed= audioState.current_position, total=audioState.total_duration)
+        task1 = p.add_task("", completed= audioState.current_position, total=audioState.total_duration, curr_time = curr_time, tot_time=tot_time)
+
+        while not p.finished:
+            if keyboard.is_pressed("q"):
+                break
+            curr_time = "{:02d}:{:02d}".format(audioState.current_position//60, (audioState.current_position)%60)
+            tot_time = "{:02d}:{:02d}".format(audioState.total_duration//60, (audioState.total_duration)%60)
+            p.update(task1, completed=audioState.current_position, curr_time = curr_time, tot_time=tot_time)
 
 def process_input(command: str, args: list, playbackController: PlaybackController):
 
